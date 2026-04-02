@@ -10,7 +10,7 @@ export function buildScript(): string {
   var targetY = 0; // rotateX target (-1 to 1)
   var currentX = 0;
   var currentY = 0;
-  var MAX_TILT = 15;
+  var MAX_TILT = 8;
   var LERP = 0.08;
   var inputActive = false;
   var idleTime = 0;
@@ -43,22 +43,31 @@ export function buildScript(): string {
 
   // --- Input: Accelerometer ---
   var hasGyro = false;
-  var isPortrait = window.matchMedia('(orientation: portrait)').matches;
-  window.matchMedia('(orientation: portrait)').addEventListener('change', function(e) {
-    isPortrait = e.matches;
-  });
+  var baseBeta = null;
+  var baseGamma = null;
+  var calibrationSamples = 0;
 
   function handleOrientation(e) {
     if (e.gamma === null || e.beta === null) return;
     hasGyro = true;
-    if (isPortrait) {
-      // Portrait (card is CSS-rotated to landscape): map accordingly
-      targetX = Math.max(-1, Math.min(1, -(e.beta - 45) / 30));
-      targetY = Math.max(-1, Math.min(1, e.gamma / 30));
-    } else {
-      targetX = Math.max(-1, Math.min(1, e.gamma / 30));
-      targetY = Math.max(-1, Math.min(1, -(e.beta - 45) / 30));
+
+    // Calibrate from first few readings to establish "neutral" hold position
+    if (calibrationSamples < 5) {
+      if (baseBeta === null) {
+        baseBeta = e.beta;
+        baseGamma = e.gamma;
+      } else {
+        baseBeta = baseBeta * 0.7 + e.beta * 0.3;
+        baseGamma = baseGamma * 0.7 + e.gamma * 0.3;
+      }
+      calibrationSamples++;
+      return;
     }
+
+    var db = e.beta - baseBeta;
+    var dg = e.gamma - baseGamma;
+    targetX = Math.max(-1, Math.min(1, dg / 30));
+    targetY = Math.max(-1, Math.min(1, -db / 30));
     inputActive = true;
   }
 

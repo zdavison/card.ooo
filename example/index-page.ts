@@ -100,14 +100,43 @@ export function buildIndexPage(): string {
     .preview-area {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
     }
-    .preview-frame {
-      width: 100%;
-      aspect-ratio: 16 / 10;
+    .preview-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .preview-controls select {
+      padding: 0.4rem 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: #fff;
+    }
+    .preview-controls label {
+      font-size: 0.8rem;
+      color: #555;
+      font-weight: 600;
+    }
+    .preview-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #e8e4df;
       border: 1px solid #e0ddd8;
       border-radius: 8px;
+      padding: 1rem;
+      min-height: 300px;
+      aspect-ratio: 16 / 10;
+    }
+    .preview-frame {
+      border: none;
+      border-radius: 4px;
       background: #e8e4df;
+      width: 100%;
+      height: 100%;
     }
     .actions {
       display: flex;
@@ -224,7 +253,24 @@ export function buildIndexPage(): string {
       </div>
 
       <div class="preview-area">
-        <iframe class="preview-frame" id="preview" sandbox="allow-scripts"></iframe>
+        <div class="preview-controls">
+          <label>Preview as</label>
+          <select id="device-select">
+            <option value="responsive">Desktop</option>
+            <option value="926x428">iPhone 13 Pro Max</option>
+            <option value="844x390">iPhone 13</option>
+            <option value="852x393">iPhone 15</option>
+            <option value="932x430">iPhone 15 Pro Max</option>
+            <option value="812x375">iPhone X / 11 Pro</option>
+            <option value="780x360">iPhone 12 mini</option>
+            <option value="896x414">iPhone 11 Pro Max</option>
+            <option value="915x412">Samsung Galaxy S21</option>
+            <option value="883x412">Pixel 7</option>
+          </select>
+        </div>
+        <div class="preview-wrapper" id="preview-wrapper">
+          <iframe class="preview-frame" id="preview" sandbox="allow-scripts"></iframe>
+        </div>
       </div>
     </div>
 
@@ -243,10 +289,34 @@ export function buildIndexPage(): string {
     var fields = ['name', 'jobTitle', 'org', 'email', 'phone', 'url', 'logo'];
     var colorFields = { bg: 'background', text: 'text', accent: 'accent' };
     var preview = document.getElementById('preview');
+    var previewWrapper = document.getElementById('preview-wrapper');
+    var deviceSelect = document.getElementById('device-select');
     var btnCopy = document.getElementById('btn-copy');
     var btnFullscreen = document.getElementById('btn-fullscreen');
     var debounceTimer;
     var lastHtml = '';
+
+    function applyDevice() {
+      var val = deviceSelect.value;
+      if (val === 'responsive') {
+        preview.style.width = '100%';
+        preview.style.height = '100%';
+        previewWrapper.style.aspectRatio = '16 / 10';
+        previewWrapper.style.height = '';
+      } else {
+        var parts = val.split('x');
+        var w = parseInt(parts[0]);
+        var h = parseInt(parts[1]);
+        var maxW = previewWrapper.parentElement.offsetWidth;
+        var scale = Math.min(1, maxW / w);
+        preview.style.width = Math.round(w * scale) + 'px';
+        preview.style.height = Math.round(h * scale) + 'px';
+        previewWrapper.style.aspectRatio = '';
+        previewWrapper.style.height = (Math.round(h * scale) + 32) + 'px';
+      }
+    }
+    deviceSelect.addEventListener('change', applyDevice);
+
 
     var loadedFonts = {};
     var fontSelect = document.getElementById('f-font');
@@ -370,6 +440,7 @@ export function buildIndexPage(): string {
     });
 
     // Initial render
+    applyDevice();
     update();
   <\/script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/prism.min.js"><\/script>
