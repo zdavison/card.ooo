@@ -7,4 +7,5 @@ Standalone 3D virtual business card renderer. `renderCard(data)` returns a self-
 ## Commands
 
 - `bun dev` — dev server with example cards
+- `bun run build` — build static site to dist/
 - `bun test` — run tests
