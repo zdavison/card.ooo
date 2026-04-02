@@ -155,20 +155,24 @@ export function buildScript(): string {
   }
   requestAnimationFrame(frame);
 
-  // --- Name auto-fit ---
-  function fitName() {
-    var el = document.querySelector('.card-name');
+  // --- Text auto-fit ---
+  function fitText(selector, minSize) {
+    var el = document.querySelector(selector);
     var container = el && el.closest('.card-main');
     if (!el || !container) return;
     el.style.fontSize = '';
     var size = parseFloat(window.getComputedStyle(el).fontSize);
-    while (el.scrollWidth > container.offsetWidth && size > 8) {
+    while (el.scrollWidth > container.offsetWidth && size > minSize) {
       size -= 0.5;
       el.style.fontSize = size + 'px';
     }
   }
-  requestAnimationFrame(fitName);
-  window.addEventListener('resize', fitName);
+  function fitAll() {
+    fitText('.card-name', 8);
+    fitText('.card-title', 4);
+  }
+  requestAnimationFrame(fitAll);
+  window.addEventListener('resize', fitAll);
 })();
   `;
 }

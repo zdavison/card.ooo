@@ -92,6 +92,8 @@ export function buildStyles(theme: ResolvedTheme): string {
       letter-spacing: 0.08em;
       color: ${theme.accent};
       margin-top: 0.35rem;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     .card-divider {
@@ -130,6 +132,19 @@ export function buildStyles(theme: ResolvedTheme): string {
     .card-qr svg, .card-qr img {
       width: 100%;
       height: 100%;
+    }
+
+    @media (orientation: portrait) and (pointer: coarse) {
+      .card-page {
+        min-height: 100dvw;
+        height: 100dvw;
+        width: 100dvh;
+        transform: rotate(90deg);
+        transform-origin: top left;
+        position: absolute;
+        top: 0;
+        left: 100dvw;
+      }
     }
   `;
 }
