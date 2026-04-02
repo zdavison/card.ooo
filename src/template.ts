@@ -23,7 +23,7 @@ export function buildTemplate(input: TemplateInput): string {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(data.name)} — ${escapeHtml(data.org)}</title>
   <meta name="theme-color" content="${escapeAttr(theme.background)}">
-  <style>${css}</style>
+  <style>${data.fontFaces || ""}${css}</style>
 </head>
 <body>
   <div class="card-page">
@@ -41,9 +41,9 @@ export function buildTemplate(input: TemplateInput): string {
           <div class="card-divider"></div>
           <div class="card-bottom">
             <div class="card-contact">
-              <span>${escapeHtml(data.email)}</span>
-              <span>${escapeHtml(data.phone)}</span>
-              <span>${escapeHtml(displayUrl)}</span>
+              <a href="mailto:${escapeAttr(data.email)}"><span>${escapeHtml(data.email)}</span></a>
+              <a href="tel:${escapeAttr(data.phone)}"><span>${escapeHtml(data.phone)}</span></a>
+              <a href="${escapeAttr(data.url)}"><span>${escapeHtml(displayUrl)}</span></a>
             </div>
             <div class="card-qr">${qrSvg}</div>
           </div>

@@ -43,28 +43,39 @@ export function buildScript(): string {
 
   // --- Input: Accelerometer ---
   var hasGyro = false;
+  var isPortrait = window.matchMedia('(orientation: portrait)').matches;
+  window.matchMedia('(orientation: portrait)').addEventListener('change', function(e) {
+    isPortrait = e.matches;
+  });
 
   function handleOrientation(e) {
-    if (e.gamma === null) return;
+    if (e.gamma === null || e.beta === null) return;
     hasGyro = true;
-    targetX = Math.max(-1, Math.min(1, e.gamma / 30));
-    targetY = Math.max(-1, Math.min(1, e.beta / 30 - 1));
+    if (isPortrait) {
+      // Portrait (card is CSS-rotated to landscape): map accordingly
+      targetX = Math.max(-1, Math.min(1, -(e.beta - 45) / 30));
+      targetY = Math.max(-1, Math.min(1, e.gamma / 30));
+    } else {
+      targetX = Math.max(-1, Math.min(1, e.gamma / 30));
+      targetY = Math.max(-1, Math.min(1, -(e.beta - 45) / 30));
+    }
     inputActive = true;
+  }
+
+  function startGyro() {
+    window.addEventListener('deviceorientation', handleOrientation);
   }
 
   if (typeof DeviceOrientationEvent !== 'undefined') {
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS 13+ — need user gesture
-      document.addEventListener('click', function iosPermission() {
+      // iOS 13+ — permission must be requested inside a user gesture
+      document.addEventListener('touchend', function() {
         DeviceOrientationEvent.requestPermission().then(function(state) {
-          if (state === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation);
-          }
-        });
-        document.removeEventListener('click', iosPermission);
+          if (state === 'granted') startGyro();
+        }).catch(function() {});
       }, { once: true });
     } else {
-      window.addEventListener('deviceorientation', handleOrientation);
+      startGyro();
     }
   }
 

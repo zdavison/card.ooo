@@ -3,10 +3,11 @@ import type { ResolvedTheme } from "./types";
 export function buildStyles(theme: ResolvedTheme): string {
   return `
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    a { color: inherit; text-decoration: none; }
 
     html, body {
       background: #e8e4df;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: ${theme.fontFamily};
       height: 100%;
       overflow: hidden;
     }
@@ -70,7 +71,7 @@ export function buildStyles(theme: ResolvedTheme): string {
       height: auto;
       opacity: 0.5;
       flex-shrink: 0;
-      filter: invert(1);
+      filter: ${theme.logoFilter};
     }
 
     .card-main {
@@ -124,7 +125,7 @@ export function buildStyles(theme: ResolvedTheme): string {
       width: 5rem;
       height: 5rem;
       opacity: 0.7;
-      color: ${theme.text};
+      color: ${theme.qrColor};
     }
 
     .card-qr svg, .card-qr img {
@@ -132,10 +133,76 @@ export function buildStyles(theme: ResolvedTheme): string {
       height: 100%;
     }
 
-    @media (max-width: 768px) {
+    @media (pointer: coarse) {
       .card-page {
-        padding: 1rem;
+        min-height: 100dvh;
+        padding: 0.75rem;
+      }
+
+      .card {
+        width: calc(100dvw - 1.5rem);
+        height: calc(100dvh - 1.5rem);
+        aspect-ratio: auto;
+      }
+
+      .card-inner {
+        padding: 1.5rem;
+      }
+
+      .card-top {
+        gap: 1.2rem;
+      }
+
+      .card-logo {
+        width: 3.5rem;
+      }
+
+      .card-name {
+        font-size: 3.2rem;
+      }
+
+      .card-title {
+        font-size: 1.4rem;
+        margin-top: 0.5rem;
+      }
+
+      .card-contact span {
+        font-size: 1.4rem;
+      }
+
+      .card-contact {
+        gap: 0.5rem;
+      }
+
+      .card-divider {
+        margin: 1rem 0 0;
+      }
+
+      .card-qr {
+        width: 25%;
+        height: auto;
+        aspect-ratio: 1;
+      }
+    }
+
+    @media (pointer: coarse) and (orientation: portrait) {
+      .card-page {
+        min-height: 100dvw;
+        height: 100dvw;
+        width: 100dvh;
+        transform: rotate(90deg);
+        transform-origin: top left;
+        position: absolute;
+        top: 0;
+        left: 100dvw;
+        padding: 0.75rem;
+      }
+
+      .card {
+        width: calc(100dvh - 1.5rem);
+        height: calc(100dvw - 1.5rem);
       }
     }
   `;
+
 }

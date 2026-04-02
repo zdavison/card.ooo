@@ -12,6 +12,9 @@ export async function renderCard(data: CardData): Promise<string> {
     background: data.theme?.background ?? DEFAULT_THEME.background,
     text: data.theme?.text ?? DEFAULT_THEME.text,
     accent: data.theme?.accent ?? DEFAULT_THEME.accent,
+    logoFilter: data.theme?.logoFilter ?? DEFAULT_THEME.logoFilter,
+    qrColor: data.theme?.qrColor ?? DEFAULT_THEME.qrColor,
+    fontFamily: data.theme?.fontFamily ?? DEFAULT_THEME.fontFamily,
   };
 
   let qrSvg: string;

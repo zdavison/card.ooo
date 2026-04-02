@@ -6,6 +6,12 @@ export interface ThemeOptions {
   text?: string;
   /** Secondary text and divider color. @default "rgba(255,255,255,0.4)" */
   accent?: string;
+  /** CSS filter applied to the logo image. @default "none" @example "invert(1)" */
+  logoFilter?: string;
+  /** Color of the QR code. @default "#fff" @example "#ffffff" */
+  qrColor?: string;
+  /** Font family for card text. @default "system-ui, -apple-system, sans-serif" @example "'Alte Haas Grotesk', sans-serif" */
+  fontFamily?: string;
 }
 
 export interface CardData {
@@ -27,16 +33,24 @@ export interface CardData {
   theme?: ThemeOptions;
   /** Custom QR code SVG string. If omitted, a vCard QR is auto-generated. @example "<svg>...</svg>" */
   qrCode?: string;
+  /** Raw CSS @font-face declarations to inject. @example "@font-face { font-family: 'My Font'; src: url('/font.woff2') format('woff2'); }" */
+  fontFaces?: string;
 }
 
 export interface ResolvedTheme {
   background: string;
   text: string;
   accent: string;
+  logoFilter: string;
+  qrColor: string;
+  fontFamily: string;
 }
 
 export const DEFAULT_THEME: ResolvedTheme = {
   background: "#111",
   text: "#fff",
   accent: "rgba(255,255,255,0.4)",
+  logoFilter: "none",
+  qrColor: "#fff",
+  fontFamily: "system-ui, -apple-system, sans-serif",
 };

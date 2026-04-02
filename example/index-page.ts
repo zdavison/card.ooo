@@ -63,9 +63,19 @@ export function buildIndexPage(): string {
       background: #fff;
       transition: border-color 0.15s;
     }
-    .form input:focus {
+    .form input:focus, .form select:focus {
       outline: none;
       border-color: #888;
+    }
+    .form select {
+      padding: 0.5rem 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: #fff;
+      transition: border-color 0.15s;
+      width: 100%;
     }
     .form-section {
       font-size: 0.7rem;
@@ -188,6 +198,17 @@ export function buildIndexPage(): string {
         <label>Logo URL <input type="text" id="f-logo" value="" placeholder="optional"></label>
 
         <div class="form-section">Theme</div>
+        <label>Font
+          <select id="f-font">
+            <option value="system-ui, -apple-system, sans-serif">System UI</option>
+            <option value="'Inter', sans-serif" data-gfont="Inter">Inter</option>
+            <option value="'DM Sans', sans-serif" data-gfont="DM+Sans">DM Sans</option>
+            <option value="'Space Grotesk', sans-serif" data-gfont="Space+Grotesk">Space Grotesk</option>
+            <option value="'IBM Plex Sans', sans-serif" data-gfont="IBM+Plex+Sans">IBM Plex Sans</option>
+            <option value="'JetBrains Mono', monospace" data-gfont="JetBrains+Mono">JetBrains Mono</option>
+            <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+          </select>
+        </label>
         <div class="color-row">
           <label>Background <input type="color" id="f-bg" value="#111111"></label>
           <label>Text <input type="color" id="f-text" value="#ffffff"></label>
@@ -227,16 +248,37 @@ export function buildIndexPage(): string {
     var debounceTimer;
     var lastHtml = '';
 
+    var loadedFonts = {};
+    var fontSelect = document.getElementById('f-font');
+    var defaultFont = 'system-ui, -apple-system, sans-serif';
+
+    function loadGoogleFont(gfont) {
+      if (!gfont || loadedFonts[gfont]) return;
+      loadedFonts[gfont] = true;
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=' + gfont + ':wght@400;700&display=swap';
+      document.head.appendChild(link);
+    }
+
     function getFormData() {
       var data = {};
       fields.forEach(function(f) {
         data[f] = document.getElementById('f-' + f).value;
       });
+      var selectedOption = fontSelect.options[fontSelect.selectedIndex];
+      var gfont = selectedOption.getAttribute('data-gfont');
+      if (gfont) loadGoogleFont(gfont);
+      var fontFamily = fontSelect.value;
       data.theme = {
         background: document.getElementById('f-bg').value,
         text: document.getElementById('f-text').value,
         accent: document.getElementById('f-accent').value,
+        fontFamily: fontFamily,
       };
+      if (gfont) {
+        data.fontFaces = '@import url("https://fonts.googleapis.com/css2?family=' + gfont + ':wght@400;700&display=swap");';
+      }
       if (!data.logo) delete data.logo;
       return data;
     }
@@ -260,11 +302,14 @@ export function buildIndexPage(): string {
       var bg = data.theme.background;
       var tx = data.theme.text;
       var ac = data.theme.accent;
-      if (bg !== '#111111' || tx !== '#ffffff' || ac !== '#666666') {
+      var ff = data.theme.fontFamily;
+      var hasTheme = bg !== '#111111' || tx !== '#ffffff' || ac !== '#666666' || ff !== defaultFont;
+      if (hasTheme) {
         lines.push(pad + 'theme: {');
         if (bg !== '#111111') lines.push(pad + '  background: "' + bg + '",');
         if (tx !== '#ffffff') lines.push(pad + '  text:       "' + tx + '",');
         if (ac !== '#666666') lines.push(pad + '  accent:     "' + ac + '",');
+        if (ff !== defaultFont) lines.push(pad + '  fontFamily: "' + escHtml(ff) + '",');
         lines.push(pad + '},');
       }
       lines.push('});');
@@ -308,6 +353,7 @@ export function buildIndexPage(): string {
     Object.keys(colorFields).forEach(function(f) {
       document.getElementById('f-' + f).addEventListener('input', debouncedUpdate);
     });
+    fontSelect.addEventListener('change', debouncedUpdate);
 
     // Copy button
     btnCopy.addEventListener('click', function() {
