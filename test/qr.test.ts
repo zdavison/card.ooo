@@ -30,9 +30,9 @@ describe("generateQrSvg", () => {
     expect(svg).toContain("</svg>");
   });
 
-  test("uses currentColor for fill", async () => {
+  test("uses currentColor for stroke", async () => {
     const svg = await generateQrSvg("test data");
-    expect(svg).toContain('fill="currentColor"');
-    expect(svg).not.toContain('fill="#ffffff"');
+    expect(svg).toContain('stroke="currentColor"');
+    expect(svg).not.toContain('stroke="#000000"');
   });
 });

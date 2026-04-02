@@ -32,5 +32,5 @@ export async function generateQrSvg(data: string): Promise<string> {
   });
   // The qrcode library renders QR modules as stroke on path elements.
   // Replace stroke with fill so consumers can use CSS currentColor theming.
-  return svg.replace(/stroke="#000000"/g, 'fill="currentColor"');
+  return svg.replace(/stroke="#000000"/g, 'stroke="currentColor"');
 }
