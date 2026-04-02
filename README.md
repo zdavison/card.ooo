@@ -1,10 +1,12 @@
 # card.ooo
 
+**[Generate your card here!](https://zdavison.github.io/card.ooo/)**
+
 Interactive 3D virtual business cards. Pass your contact data, get back a self-contained HTML page with tilt and shine effects.
 
 ![card.ooo screenshot](assets/screenshot.png)
 
-## Usage
+## Usage (in code)
 
 ```ts
 import { renderCard } from "card.ooo";

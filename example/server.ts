@@ -1,8 +1,15 @@
-import { darkCard, lightCard } from "./cards";
 import { buildIndexPage } from "./index-page";
 
-const readmeMd = await Bun.file("README.md").text();
-const indexHtml = buildIndexPage(readmeMd, "/");
+// Build the browser bundle on startup
+await Bun.build({
+  entrypoints: ["src/browser.ts"],
+  outdir: "dist",
+  target: "browser",
+  minify: false,
+  naming: "card.js",
+});
+
+const indexHtml = buildIndexPage();
 
 Bun.serve({
   port: 3000,
@@ -10,18 +17,9 @@ Bun.serve({
     "/": new Response(indexHtml, {
       headers: { "content-type": "text/html" },
     }),
-    "/dark": new Response(darkCard, {
-      headers: { "content-type": "text/html" },
+    "/card.js": new Response(Bun.file("dist/card.js"), {
+      headers: { "content-type": "application/javascript" },
     }),
-    "/light": new Response(lightCard, {
-      headers: { "content-type": "text/html" },
-    }),
-    "/assets/*": async (req) => {
-      const path = new URL(req.url).pathname;
-      const file = Bun.file(`.${path}`);
-      if (await file.exists()) return new Response(file);
-      return new Response("Not found", { status: 404 });
-    },
   },
   development: {
     hmr: true,

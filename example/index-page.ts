@@ -1,12 +1,10 @@
-export function buildIndexPage(readmeMd: string, linkPrefix = "/"): string {
-  const readmeHtml = markdownToHtml(readmeMd);
-
+export function buildIndexPage(): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>card.ooo</title>
+  <title>card.ooo — 3D virtual business cards</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -16,131 +14,321 @@ export function buildIndexPage(readmeMd: string, linkPrefix = "/"): string {
       line-height: 1.6;
     }
     .container {
-      max-width: 860px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 3rem 1.5rem;
+      padding: 2rem 1.5rem;
     }
-    .examples {
+    header {
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      color: #666;
+      margin-top: 0.25rem;
+    }
+    .editor {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .editor {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form {
       display: flex;
-      gap: 1rem;
-      margin: 2rem 0;
+      flex-direction: column;
+      gap: 0.75rem;
     }
-    .examples a {
-      display: inline-block;
-      padding: 0.6rem 1.2rem;
-      background: #111;
-      color: #fff;
-      text-decoration: none;
+    .form label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #555;
+    }
+    .form input {
+      padding: 0.5rem 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: #fff;
+      transition: border-color 0.15s;
+    }
+    .form input:focus {
+      outline: none;
+      border-color: #888;
+    }
+    .form-section {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-top: 0.5rem;
+    }
+    .color-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .color-row label {
+      flex: 1;
+    }
+    .color-row input[type="color"] {
+      padding: 0.2rem;
+      height: 2rem;
+      cursor: pointer;
+    }
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .preview-frame {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border: 1px solid #e0ddd8;
+      border-radius: 8px;
+      background: #e8e4df;
+    }
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      border: none;
       border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
       transition: opacity 0.15s;
     }
-    .examples a:hover { opacity: 0.8; }
-    .examples a.light {
-      background: #e8e4df;
-      color: #111;
+    .btn:hover { opacity: 0.85; }
+    .btn-primary {
+      background: #111;
+      color: #fff;
     }
-    .readme h1 { font-size: 2rem; margin: 1.5rem 0 0.5rem; }
-    .readme h2 { font-size: 1.3rem; margin: 2rem 0 0.5rem; border-bottom: 1px solid #e0ddd8; padding-bottom: 0.3rem; }
-    .readme p { margin: 0.5rem 0; }
-    .readme img { max-width: 100%; border-radius: 8px; margin: 1rem auto; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
-    .readme pre {
+    .btn-secondary {
+      background: #e8e4df;
+      color: #333;
+    }
+    .btn-success {
+      background: #2d7d46;
+      color: #fff;
+    }
+    .fullscreen-link {
+      font-size: 0.8rem;
+      color: #888;
+      text-decoration: none;
+    }
+    .fullscreen-link:hover { color: #444; }
+    .usage {
+      margin-top: 3rem;
+      border-top: 1px solid #e0ddd8;
+      padding-top: 2rem;
+    }
+    .usage h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+    .usage p {
+      margin: 0.5rem 0;
+      color: #444;
+    }
+    .usage pre {
       background: #1a1a1a;
       color: #e0e0e0;
       padding: 1rem;
       border-radius: 6px;
       overflow-x: auto;
-      margin: 0.5rem 0;
+      margin: 0.75rem 0;
       font-size: 0.75rem;
       line-height: 1.5;
     }
-    .readme code {
+    .usage code {
       font-family: "SF Mono", "Fira Code", monospace;
-      font-size: 0.75em;
     }
-    .readme p code, .readme li code {
+    .usage p code {
       background: #eee;
       padding: 0.15em 0.35em;
       border-radius: 3px;
+      font-size: 0.8em;
     }
-    .readme pre code {
-      background: none;
-      padding: 0;
-      border-radius: 0;
-      color: inherit;
-    }
-    .readme ul, .readme ol { padding-left: 1.5rem; margin: 0.5rem 0; }
-    .readme li { margin: 0.25rem 0; }
-    .readme strong { font-weight: 600; }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css">
 </head>
 <body>
   <div class="container">
-    <div class="examples">
-      <a href="${linkPrefix}dark">Example: Dark</a>
-      <a href="${linkPrefix}light" class="light">Example: Light</a>
+    <header>
+      <h1>card.ooo</h1>
+      <p>Interactive 3D virtual business cards. Edit below, copy the HTML, host it anywhere.</p>
+    </header>
+
+    <div class="editor">
+      <div class="form">
+        <label>Name <input type="text" id="f-name" value="Zachary Davison"></label>
+        <label>Job Title <input type="text" id="f-jobTitle" value="Co-Founder"></label>
+        <label>Organization <input type="text" id="f-org" value="Little Tone Records"></label>
+        <label>Email <input type="email" id="f-email" value="hello@example.com"></label>
+        <label>Phone <input type="text" id="f-phone" value="+1 555 867 5309"></label>
+        <label>Website <input type="url" id="f-url" value="https://example.com"></label>
+        <label>Logo URL <input type="text" id="f-logo" value="" placeholder="optional"></label>
+
+        <div class="form-section">Theme</div>
+        <div class="color-row">
+          <label>Background <input type="color" id="f-bg" value="#111111"></label>
+          <label>Text <input type="color" id="f-text" value="#ffffff"></label>
+          <label>Accent <input type="color" id="f-accent" value="#666666"></label>
+        </div>
+
+        <div style="margin-top: 0.5rem">
+          <div class="actions">
+            <button class="btn btn-primary" id="btn-copy">Copy HTML</button>
+            <a class="btn btn-secondary" id="btn-fullscreen" href="about:blank" target="_blank">Open fullscreen</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-area">
+        <iframe class="preview-frame" id="preview" sandbox="allow-scripts"></iframe>
+      </div>
     </div>
-    <div class="readme">
-      ${readmeHtml}
+
+    <div class="usage">
+      <h2>Use in code</h2>
+      <p>Install the package to dynamically generate cards in your app:</p>
+      <pre class="language-bash"><code class="language-bash">bun add card.ooo</code></pre>
+      <p>Then call <code>renderCard()</code> and serve the result:</p>
+      <pre class="language-typescript"><code class="language-typescript" id="code-usage"></code></pre>
+      <p><code>renderCard()</code> returns a self-contained HTML page with all CSS, JS, and 3D effects inlined. No runtime dependencies — just serve the string.</p>
     </div>
   </div>
+
+  <script src="./card.js"><\/script>
+  <script>
+    var fields = ['name', 'jobTitle', 'org', 'email', 'phone', 'url', 'logo'];
+    var colorFields = { bg: 'background', text: 'text', accent: 'accent' };
+    var preview = document.getElementById('preview');
+    var btnCopy = document.getElementById('btn-copy');
+    var btnFullscreen = document.getElementById('btn-fullscreen');
+    var debounceTimer;
+    var lastHtml = '';
+
+    function getFormData() {
+      var data = {};
+      fields.forEach(function(f) {
+        data[f] = document.getElementById('f-' + f).value;
+      });
+      data.theme = {
+        background: document.getElementById('f-bg').value,
+        text: document.getElementById('f-text').value,
+        accent: document.getElementById('f-accent').value,
+      };
+      if (!data.logo) delete data.logo;
+      return data;
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function buildCodeSnippet(data) {
+      var pad = '  ';
+      var lines = ['import { renderCard } from "card.ooo";', '', 'const html = await renderCard({'];
+      lines.push(pad + 'name:     "' + escHtml(data.name) + '",');
+      lines.push(pad + 'jobTitle: "' + escHtml(data.jobTitle) + '",');
+      lines.push(pad + 'org:      "' + escHtml(data.org) + '",');
+      lines.push(pad + 'email:    "' + escHtml(data.email) + '",');
+      lines.push(pad + 'phone:    "' + escHtml(data.phone) + '",');
+      lines.push(pad + 'url:      "' + escHtml(data.url) + '",');
+      if (data.logo) {
+        lines.push(pad + 'logo:     "' + escHtml(data.logo) + '",');
+      }
+      var bg = data.theme.background;
+      var tx = data.theme.text;
+      var ac = data.theme.accent;
+      if (bg !== '#111111' || tx !== '#ffffff' || ac !== '#666666') {
+        lines.push(pad + 'theme: {');
+        if (bg !== '#111111') lines.push(pad + '  background: "' + bg + '",');
+        if (tx !== '#ffffff') lines.push(pad + '  text:       "' + tx + '",');
+        if (ac !== '#666666') lines.push(pad + '  accent:     "' + ac + '",');
+        lines.push(pad + '},');
+      }
+      lines.push('});');
+      lines.push('');
+      lines.push('Bun.serve({');
+      lines.push('  routes: {');
+      lines.push('    "/card": () =&gt; new Response(html, {');
+      lines.push('      headers: { "content-type": "text/html" },');
+      lines.push('    }),');
+      lines.push('  },');
+      lines.push('});');
+      return lines.join('\\n');
+    }
+
+    function updateCode(data) {
+      var el = document.getElementById('code-usage');
+      el.innerHTML = buildCodeSnippet(data);
+      if (window.Prism) Prism.highlightElement(el);
+    }
+
+    function update() {
+      var data = getFormData();
+      updateCode(data);
+      renderCard(data).then(function(html) {
+        lastHtml = html;
+        preview.srcdoc = html;
+        var blob = new Blob([html], { type: 'text/html' });
+        btnFullscreen.href = URL.createObjectURL(blob);
+      });
+    }
+
+    function debouncedUpdate() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(update, 200);
+    }
+
+    // Bind all inputs
+    fields.forEach(function(f) {
+      document.getElementById('f-' + f).addEventListener('input', debouncedUpdate);
+    });
+    Object.keys(colorFields).forEach(function(f) {
+      document.getElementById('f-' + f).addEventListener('input', debouncedUpdate);
+    });
+
+    // Copy button
+    btnCopy.addEventListener('click', function() {
+      if (!lastHtml) return;
+      navigator.clipboard.writeText(lastHtml).then(function() {
+        var orig = btnCopy.textContent;
+        btnCopy.textContent = 'Copied!';
+        btnCopy.className = 'btn btn-success';
+        setTimeout(function() {
+          btnCopy.textContent = orig;
+          btnCopy.className = 'btn btn-primary';
+        }, 1500);
+      });
+    });
+
+    // Initial render
+    update();
+  <\/script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/prism.min.js"><\/script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"><\/script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"><\/script>
 </body>
 </html>`;
-}
-
-function markdownToHtml(md: string): string {
-  let html = md;
-
-  html = html.replace(/^# .+\n\n?/, "");
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">');
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
-    const langMap: Record<string, string> = { ts: "typescript", sh: "bash", js: "javascript" };
-    const cls = lang ? ` class="language-${langMap[lang] || lang}"` : "";
-    return `<pre${cls}><code${cls}>${escapeHtml(code.trim())}</code></pre>`;
-  });
-  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
-  html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
-  html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
-  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, "<ul>\n$1</ul>");
-
-  const preBlocks: string[] = [];
-  html = html.replace(/<pre[\s\S]*?<\/pre>/g, (match) => {
-    preBlocks.push(match);
-    return `%%PRE${preBlocks.length - 1}%%`;
-  });
-
-  html = html
-    .split("\n\n")
-    .map((block) => {
-      const trimmed = block.trim();
-      if (
-        !trimmed ||
-        trimmed.startsWith("<h") ||
-        trimmed.startsWith("<ul") ||
-        trimmed.startsWith("%%PRE") ||
-        trimmed.startsWith("<img")
-      ) {
-        return trimmed;
-      }
-      return `<p>${trimmed}</p>`;
-    })
-    .join("\n\n");
-
-  html = html.replace(/%%PRE(\d+)%%/g, (_, i) => preBlocks[parseInt(i)]);
-
-  return html;
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }

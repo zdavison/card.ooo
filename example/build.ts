@@ -1,25 +1,21 @@
-import { mkdir } from "node:fs/promises";
-import { darkCard, lightCard } from "./cards";
+import { mkdir, rm } from "node:fs/promises";
 import { buildIndexPage } from "./index-page";
 
-const readmeMd = await Bun.file("README.md").text();
-const indexHtml = buildIndexPage(readmeMd, "./");
-
 const outDir = "dist";
+await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
-await mkdir(`${outDir}/dark`, { recursive: true });
-await mkdir(`${outDir}/light`, { recursive: true });
-await mkdir(`${outDir}/assets`, { recursive: true });
 
-await Promise.all([
-  Bun.write(`${outDir}/index.html`, indexHtml),
-  Bun.write(`${outDir}/dark/index.html`, darkCard),
-  Bun.write(`${outDir}/light/index.html`, lightCard),
-  Bun.file("assets/screenshot.png").exists().then(async (exists) => {
-    if (exists) {
-      await Bun.write(`${outDir}/assets/screenshot.png`, Bun.file("assets/screenshot.png"));
-    }
-  }),
-]);
+// Bundle renderCard() for the browser
+await Bun.build({
+  entrypoints: ["src/browser.ts"],
+  outdir: outDir,
+  target: "browser",
+  minify: true,
+  naming: "card.js",
+});
+
+// Write the editor page
+const indexHtml = buildIndexPage();
+await Bun.write(`${outDir}/index.html`, indexHtml);
 
 console.log("Built to dist/");
