@@ -1,6 +1,6 @@
 {
   "name": "card.ooo",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "main": "lib/index.js",
   "types": "src/index.ts",
@@ -11,7 +11,10 @@
       "types": "./src/index.ts"
     }
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "scripts": {
     "dev": "bun --hot example/server.ts",
     "build": "bun example/build.ts",
