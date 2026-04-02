@@ -51,6 +51,9 @@ export function buildTemplate(input: TemplateInput): string {
       </div>
     </div>
   </div>
+  <div class="card-qr-overlay">
+    <div class="card-qr-overlay-inner">${qrSvg}</div>
+  </div>
   <script>${js}</script>
 </body>
 </html>`;

@@ -25,7 +25,7 @@ export function buildStyles(theme: ResolvedTheme): string {
 
     .card {
       aspect-ratio: 3.5 / 2;
-      width: min(500px, 85vw, 85vh * 1.75);
+      width: min(500px, 94vw, 94vh * 1.75);
       background: ${theme.background};
       border-radius: 6px;
       position: relative;
@@ -134,6 +134,43 @@ export function buildStyles(theme: ResolvedTheme): string {
       height: 100%;
     }
 
+    .card-qr {
+      cursor: pointer;
+    }
+
+    .card-qr-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      cursor: pointer;
+    }
+
+    .card-qr-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .card-qr-overlay-inner {
+      width: min(80vw, 80vh, 400px);
+      aspect-ratio: 1;
+      color: #fff;
+    }
+
+    .card-qr-overlay-inner svg, .card-qr-overlay-inner img {
+      width: 100%;
+      height: 100%;
+    }
+
     @media (orientation: portrait) and (pointer: coarse) {
       .card-page {
         min-height: 100dvw;
@@ -144,6 +181,10 @@ export function buildStyles(theme: ResolvedTheme): string {
         position: absolute;
         top: 0;
         left: 100dvw;
+      }
+
+      .card {
+        width: min(500px, 94dvh, 94dvw * 1.75);
       }
     }
   `;

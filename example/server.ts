@@ -27,4 +27,9 @@ Bun.serve({
   },
 });
 
+const ip = Object.values(require("os").networkInterfaces())
+  .flat()
+  .find((i: any) => i?.family === "IPv4" && !i.internal)?.address;
+
 console.log("Dev server running at http://localhost:3000");
+if (ip) console.log(`  Network:  http://${ip}:3000`);
