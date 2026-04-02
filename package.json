@@ -1,11 +1,22 @@
 {
   "name": "card.ooo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "import": "./lib/index.js",
+      "types": "./src/index.ts"
+    }
+  },
+  "files": ["lib", "src"],
   "scripts": {
     "dev": "bun --hot example/server.ts",
     "build": "bun example/build.ts",
+    "build:lib": "bun build src/index.ts --outdir lib --target node --format esm --packages external",
+    "prepublishOnly": "bun run build:lib",
     "test": "bun test"
   },
   "dependencies": {
